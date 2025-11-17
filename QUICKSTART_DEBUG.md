@@ -2,15 +2,24 @@
 
 **Goal**: Run a simple Wikipedia task with your local VLM to verify everything works.
 
-## 3-Step Setup
+> **Note**: This guide uses template files to avoid overwriting your existing configurations.
+> See `DEBUG_SETUP_INSTRUCTIONS.md` for detailed setup instructions.
 
-### 1. Create the test task
+## Prerequisites
+
+1. Local VLM running (vLLM, SGLang, LM Studio, Ollama, etc.)
+2. Python environment with ExACT dependencies
+3. Playwright browsers installed (`playwright install chromium`)
+
+## Quick Setup (4 Steps)
+
+### 1. Copy template files
 
 ```bash
-python3 setup_debug_task.py
+cp debug_env.sh.template debug_env.sh
+cp debug_run.sh.template debug_run.sh
+chmod +x debug_run.sh
 ```
-
-This creates a simple task: "What year was Python first released?" (answer: 1991)
 
 ### 2. Configure your VLM
 
@@ -20,34 +29,54 @@ Edit `debug_env.sh`:
 vim debug_env.sh
 ```
 
-Change these two lines:
+**Change these two lines:**
 ```bash
-export VLM_ENDPOINT="http://localhost:8000/v1"  # Your VLM endpoint
-export VLM_MODEL_NAME="your-model-name"          # Your model name
+export VLM_ENDPOINT="http://localhost:8000/v1"  # ← Your VLM endpoint
+export VLM_MODEL_NAME="your-model-name"          # ← Your model name
 ```
 
 **Examples**:
-- vLLM: `http://localhost:8000/v1` with model like `"llava-hf/llava-v1.6-vicuna-13b-hf"`
-- SGLang: `http://localhost:30000/v1` with model like `"lmms-lab/llama3-llava-next-8b"`
-- LM Studio: `http://localhost:1234/v1` with whatever model name you loaded
-- Ollama: `http://localhost:11434/v1` with model like `"llava:13b"`
+- vLLM: `http://localhost:8000/v1` with model `"llava-hf/llava-v1.6-vicuna-13b-hf"`
+- SGLang: `http://localhost:30000/v1` with model `"lmms-lab/llama3-llava-next-8b"`
+- LM Studio: `http://localhost:1234/v1` with your loaded model name
+- Ollama: `http://localhost:11434/v1` with model `"llava:13b"`
 
-Then load the environment:
+### 3. Create test task and add provider
+
+**Create the test task:**
 ```bash
-source debug_env.sh
+python3 setup_debug_task.py
 ```
 
-### 3. Run the test
+**Add your VLM provider to providers.yaml:**
+```bash
+# See examples first
+cat configs/llms/providers.yaml.example
+
+# Edit your providers.yaml
+vim configs/llms/providers.yaml
+```
+
+Add your provider (example):
+```yaml
+local_vlm:
+    provider: openai
+    llm_api_base: http://localhost:8000/v1
+    llm_api_version: ''
+```
+
+### 4. Run the test
 
 ```bash
+source debug_env.sh
 ./debug_run.sh
 ```
 
 ## What Happens
 
-1. Browser opens Wikipedia page about Python
-2. Your VLM sees the page and the task
-3. Agent tries to find the release year
+1. Browser opens Wikipedia page about Python programming language
+2. Your VLM sees the page and the task: *"What year was Python first released?"*
+3. Agent tries to find the answer (1991)
 4. Results saved to `data/debug_wikipedia/`
 
 ## Check Results
@@ -69,7 +98,8 @@ cat data/debug_wikipedia/log_files/*.log
 
 Your VLM isn't running or wrong endpoint. Test it:
 ```bash
-curl http://localhost:8000/v1/models
+source debug_env.sh
+curl $VLM_ENDPOINT/models
 ```
 
 Should return your model list.
@@ -78,7 +108,7 @@ Should return your model list.
 
 Wrong model name. Check what's available:
 ```bash
-curl http://localhost:8000/v1/models
+curl $VLM_ENDPOINT/models
 ```
 
 ### Want to use text-only mode?
@@ -95,53 +125,84 @@ This avoids needing vision capabilities.
 
 See the detailed guide: `DEBUG_RUN_WIKIPEDIA_TASK.md`
 
+## What Files Were Modified?
+
+**Created (your local copies from templates):**
+- ✅ `debug_env.sh` - Your VLM configuration
+- ✅ `debug_run.sh` - Your test script
+- ✅ `configs/visualwebarena/test_wikipedia_debug/` - Test tasks
+
+**Modified (you should edit):**
+- ✅ `configs/llms/providers.yaml` - Added your provider
+
+**NOT Modified (original templates):**
+- ✅ `debug_env.sh.template` - Clean template
+- ✅ `debug_run.sh.template` - Clean template
+- ✅ `configs/llms/providers.yaml.example` - Examples only
+
 ## Next Steps
 
-Once this works:
+Once task 999 works:
 
-1. **Try the search task** (requires interaction):
+1. **Try task 998** (requires search):
    ```bash
-   # Edit debug_run.sh, change test_idx to 998
-   vim debug_run.sh  # Change test_idx="999" to test_idx="998"
+   # Edit debug_run.sh, change test_idx="999" to test_idx="998"
+   vim debug_run.sh
    ./debug_run.sh
    ```
 
-2. **Increase max_steps** to let agent explore more:
+2. **Increase max_steps** for more exploration:
    ```bash
    # In debug_run.sh, change max_steps=3 to max_steps=10
    ```
 
 3. **Try a real VWA task**:
    ```bash
-   # Follow instructions in DEBUG_RUN_WIKIPEDIA_TASK.md
+   # See DEBUG_RUN_WIKIPEDIA_TASK.md
    # Section: "Running Real VWA Wikipedia Tasks"
    ```
-
-## Files Created
-
-- `debug_env.sh` - Environment configuration
-- `debug_run.sh` - Test runner script
-- `setup_debug_task.py` - Creates test tasks
-- `configs/visualwebarena/test_wikipedia_debug/999.json` - Simple test task
-- `configs/visualwebarena/test_wikipedia_debug/998.json` - Search test task
 
 ## Expected Output (Success)
 
 ```
+=========================================
+Running Wikipedia Debug Task
+=========================================
+Model: llava-v1.6-vicuna-13b-hf
+Provider: local_vlm
+Test task: 999
+Max steps: 3
+=========================================
+
 [Intent]: What year was Python first released?
 [Config file]: configs/visualwebarena/test_wikipedia_debug/999.json
 ...
 [Action]: click [element_id]
 ...
-[Action]: type [element_id] [text]
-...
 [Result] (PASS)
+
+=========================================
+Done!
+=========================================
+Results saved to: data/debug_wikipedia
 ```
 
-That's it! Once you see `(PASS)`, your pipeline is working.
+## Keep Your Workspace Clean
+
+Add to `.gitignore`:
+```bash
+cat >> .gitignore << 'EOF'
+
+# Local debugging files (created from templates)
+debug_env.sh
+debug_run.sh
+data/debug_wikipedia/
+configs/visualwebarena/test_wikipedia_debug/
+EOF
+```
 
 ---
 
-**For more details**, see:
-- `DEBUG_RUN_WIKIPEDIA_TASK.md` - Complete debugging guide
-- `DEBUG_VWA_WIKIPEDIA_LINK.md` - Understanding the link system
+**For detailed setup**: See `DEBUG_SETUP_INSTRUCTIONS.md`
+**For troubleshooting**: See `DEBUG_RUN_WIKIPEDIA_TASK.md`
+**For understanding VWA links**: See `DEBUG_VWA_WIKIPEDIA_LINK.md`

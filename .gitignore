@@ -1,0 +1,6 @@
+
+# Local debugging files (created from templates - don't commit these)
+debug_env.sh
+debug_run.sh
+data/debug_wikipedia/
+configs/visualwebarena/test_wikipedia_debug/
