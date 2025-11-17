@@ -1,0 +1,49 @@
+# Example VLM Provider Configurations
+# Copy entries you need to providers.yaml
+
+openai:
+    provider: openai
+    llm_api_base: https://api.openai.com/v1
+    llm_api_version: ''
+
+# Example: SGLang server (supports vision models like LLaVA)
+sglang:
+    provider: sglang
+    llm_api_base: http://localhost:30000/v1
+    llm_api_version: ''
+
+# Example: vLLM server (OpenAI-compatible API)
+vllm:
+    provider: openai  # Use 'openai' for OpenAI-compatible endpoints
+    llm_api_base: http://localhost:8000/v1
+    llm_api_version: ''
+
+# Example: Local VLM for debugging
+local_vlm:
+    provider: openai  # Use 'openai' for most local VLMs with OpenAI API
+    llm_api_base: http://localhost:8000/v1  # Change to your endpoint
+    llm_api_version: ''
+
+# Example: LM Studio
+lmstudio:
+    provider: openai
+    llm_api_base: http://localhost:1234/v1
+    llm_api_version: ''
+
+# Example: Ollama (with OpenAI compatibility)
+ollama:
+    provider: openai
+    llm_api_base: http://localhost:11434/v1
+    llm_api_version: ''
+
+# Example: Azure OpenAI
+azure:
+    provider: azure
+    llm_api_base: https://your-resource.openai.azure.com
+    llm_api_version: '2024-02-15-preview'
+
+# Instructions:
+# 1. Copy the provider configuration you need to providers.yaml
+# 2. Update the llm_api_base with your actual endpoint
+# 3. Update llm_api_version if needed
+# 4. Reference this provider name in your debug_env.sh
