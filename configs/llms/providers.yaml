@@ -3,12 +3,38 @@ openai:
     llm_api_base: https://api.openai.com/v1
     llm_api_version: ''
 
+# Example: SGLang server (supports vision models)
 sglang:
     provider: sglang
-    llm_api_base: http://localhost:xxxx/v1
+    llm_api_base: http://localhost:30000/v1
     llm_api_version: ''
 
+# Example: vLLM server (OpenAI-compatible API)
+vllm:
+    provider: openai  # Use 'openai' for OpenAI-compatible endpoints
+    llm_api_base: http://localhost:8000/v1
+    llm_api_version: ''
+
+# Example: Local VLM for debugging (edit this!)
+local_vlm:
+    provider: openai  # Use 'openai' for most local VLMs with OpenAI API
+    llm_api_base: http://localhost:8000/v1  # Change to your endpoint
+    llm_api_version: ''
+
+# Example: LM Studio
+lmstudio:
+    provider: openai
+    llm_api_base: http://localhost:1234/v1
+    llm_api_version: ''
+
+# Example: Ollama (with OpenAI compatibility)
+ollama:
+    provider: openai
+    llm_api_base: http://localhost:11434/v1
+    llm_api_version: ''
+
+# Example: Azure OpenAI
 azure:
     provider: azure
-    llm_api_base: http://xxx
-    llm_api_version: 'xxx'
+    llm_api_base: https://your-resource.openai.azure.com
+    llm_api_version: '2024-02-15-preview'
